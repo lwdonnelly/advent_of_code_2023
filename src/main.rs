@@ -43,7 +43,7 @@ fn day1() {
                 }
                 if cur_last_index.unwrap().ge(&last.0.unwrap_or(0)) {
                    last.0 = cur_last_index;
-                    last.1 = *value;
+                   last.1 = *value;
                 }
             }
         }
