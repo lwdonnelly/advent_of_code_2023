@@ -51,28 +51,21 @@ fn day1() {
 
        total += (first.1 * 10) + last.1;
     }
-    println!("{}", total);
+    println!("Day 1 - {}", total);
 }
 
 fn day2() {
     let input = fs::read_to_string("day2_input.txt").expect("Reading input failed");
 
-    let max_red = 12;
-    let max_green = 13;
-    let max_blue = 14;
-
     let mut total = 0;
-    'line_loop: for line in input.split("\n") {
-        let first_space_index = line.find(" ");
-        let first_space_index = match first_space_index {
-            Some(i) => first_space_index.unwrap(),
+    for line in input.split("\n") {
+        let colon_index = line.find(":");
+        let colon_index = match colon_index {
+            Some(_i) => colon_index.unwrap(),
             None => break
         };
-        let colon_index = line.find(":").expect("could not find colon");
-        let game_number = &line[first_space_index + 1..colon_index].parse::<i32>().unwrap();
+
         let line = &line[colon_index + 1..];
-        let mut possible = true;
-        //get max of each color, then multiply them all together
         let mut max_map: HashMap<&str, i32> = HashMap::from([
             ("blue", 0),
             ("red", 0),
@@ -91,5 +84,5 @@ fn day2() {
         }
         total += max_map.get("red").unwrap_or(&1) * max_map.get("green").unwrap_or(&1) * max_map.get("blue").unwrap_or(&1);
     }
-    println!("{}", total)
+    println!("Day 2 - {}", total)
 }
