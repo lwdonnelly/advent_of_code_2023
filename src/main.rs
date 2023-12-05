@@ -4,6 +4,7 @@ use std::collections::HashMap;
 fn main() {
     day1();
     day2();
+    day3();
 }
 
 fn day1() {
@@ -85,4 +86,60 @@ fn day2() {
         total += max_map.get("red").unwrap_or(&1) * max_map.get("green").unwrap_or(&1) * max_map.get("blue").unwrap_or(&1);
     }
     println!("Day 2 - {}", total)
+}
+
+fn day3() {
+    let original_input = fs::read_to_string("day3_input.txt").expect("Reading input failed").to_owned();
+    let mut input = original_input.clone();
+
+
+    let mut numbers_with_indices: Vec<_> = original_input.match_indices(|c: char| c.is_digit(10)).collect();
+    for i in (1..numbers_with_indices.len()).rev() {
+        if numbers_with_indices[i].0 == numbers_with_indices[i-1].0 + 1 {
+            numbers_with_indices[i].1 = &original_input[numbers_with_indices[i-1].0..numbers_with_indices[i].0 + numbers_with_indices[i].1.len()];
+            numbers_with_indices[i].0 -= 1;
+            numbers_with_indices.remove(i-1);
+        }
+    }
+
+    input.retain(|c| !c.is_ascii_whitespace());
+    let mut total = 0;
+    for i in 0..numbers_with_indices.len() {
+        let index = numbers_with_indices[i].0 - (numbers_with_indices[i].0 / 141);//account for deleted new line chars
+        let number = numbers_with_indices[i].1;
+        let mut adjacent_chars = "".to_owned();
+        let left_edge = index % 140 == 0;
+        let right_edge = (index + number.len() - 1) % 140 == 139;
+        if index >= 140 {
+            if !left_edge {
+                adjacent_chars =  adjacent_chars + &input[index - 140 - 1..index - 140];
+            }
+            adjacent_chars = adjacent_chars + &input[index - 140..index - 140 + number.len()];
+            if !right_edge {
+                adjacent_chars = adjacent_chars + &input[index - 140 + number.len()..index - 140 + number.len() + 1];
+            }
+        }
+        if !left_edge {
+            adjacent_chars = adjacent_chars + &input[index - 1..index];
+        }
+        if !right_edge {
+            adjacent_chars = adjacent_chars + &input[index + number.len()..index + number.len() + 1];
+        }
+        if !(input.len() - 140..input.len()).contains(&index)   {
+            if !left_edge {
+                adjacent_chars = adjacent_chars + &input[index + 140 - 1..index + 140];
+            }
+            adjacent_chars = adjacent_chars + &input[index + 140..index + 140 + number.len()];
+            if !right_edge {
+                adjacent_chars = adjacent_chars + &input[index + 140 + number.len()..index + 140 + number.len() + 1];
+            }
+        }
+
+        println!("{} - {} - {}", index, number, adjacent_chars);
+        if !adjacent_chars.chars().filter(|c: &char| !c.is_digit(10)).filter(|c: &char| *c != '.').collect::<Vec<_>>().is_empty() {
+            total += number.parse::<i32>().unwrap();
+        }
+    }
+
+    println!("Day 3 - {}", total)
 }
